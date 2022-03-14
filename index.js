@@ -2,12 +2,17 @@ const express = require('express');
 const bodypaser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2'); 
+const  multipart  =  require('connect-multiparty');
+const  multipartMiddleware  =  multipart({ uploadDir:  './uploads' });
+
 
 const app = express();
 
 
 app.use(cors());
-app.use(bodypaser.json());
+
+urlEncodedParser = app.use(bodypaser.json());
+
 
 
 ////Database connection
@@ -50,21 +55,13 @@ app.post('/registration', (req, res) =>{
      VALUES ("${first_last_name}","${gender}","${birth_date}","${student_mail}","${institution}","${registration_proof}","${mobile_number}","${programing_skills}","${applicant_status}","${information_source}","${participant_id}")`;
     db.query(qr,(err,result)=>
     {
-        if(err){console.log(err)}
-
-        if (result.length>0)
-        {   
-            res.send(
-                {
-                    message:"Data Captured..."
-                });
-        }
-        else{
-            res.send(
-                {
-                    message:"Enter all fields..."
-                })
-        }
+        if(err){console.log(err);}
+        console.log(result,"result")
+        res.send(
+            {
+                message:"Data Captured..."
+            });
+      
     } );
 });
 
@@ -74,5 +71,5 @@ app.post('/registration', (req, res) =>{
 
 app.listen(9500,() =>{
 
-    console.log('server running....On port');
+    console.log('server running....On port:9500');
 }); 
