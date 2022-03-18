@@ -179,6 +179,7 @@ app.post('/registration', (req, res) =>{
     console.log(req.body,'LoadToRagistration');
 
     let names = req.body.fullnam;
+    let surname = req.body.surname;
     let gender = req.body.gender;
     let dateBirth = req.body.dateBirth;
     let stEmail = req.body.stEmail;
@@ -192,7 +193,7 @@ app.post('/registration', (req, res) =>{
 
 
  
-    let sql1 =`INSERT INTO applica( names, gender, dateBirth, stud_email, password, institute, academicRecord, mobileNumber, skill, status) VALUES ("${names}", "${gender}", "${dateBirth}","${stEmail}","${password}","${institute}","${proof}","${mNumber}","${skills}","${stat}") `;
+    let sql1 =`INSERT INTO app( names,surname, gender, dateBirth, email, password, institute, academicRecord, mobileNumber, skill, status) VALUES ("${names}","${surname}", "${gender}", "${dateBirth}","${stEmail}","${password}","${institute}","${proof}","${mNumber}","${skills}","${stat}") `;
 
     
     db.query(sql1,(err,result) =>{
