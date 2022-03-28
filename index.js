@@ -18,7 +18,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password:'',
-    database: 'user',
+    database: 'tvhweb',
     port:3306
 })
 
@@ -68,12 +68,12 @@ app.post('/login', (req, res) =>{
 
     console.log(req.body,'loginbox');
 
-    let names = req.body.fullnam;
+ 
     let eml = req.body.emal;
     let pass = req.body.passw;
 
  
-    let sql1 =`SELECT email, password, admin_name from admin WHERE email = "${eml}" AND password = "${pass}" AND admin_name = "${names}" `;
+    let sql1 =`SELECT email, password from admin WHERE email = "${eml}" AND password = "${pass}" `;
 
     
     db.query(sql1,(err,result) =>{
@@ -193,7 +193,7 @@ app.post('/registration', (req, res) =>{
 
 
  
-    let sql1 =`INSERT INTO app( names,surname, gender, dateBirth, email, password, institute, academicRecord, mobileNumber, skill, status) VALUES ("${names}","${surname}", "${gender}", "${dateBirth}","${stEmail}","${password}","${institute}","${proof}","${mNumber}","${skills}","${stat}") `;
+    let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${names}","${surname}", "${gender}", "${dateBirth}","${stEmail}","${institute}","${proof}","${mNumber}","${skills}") `;
 
     
     db.query(sql1,(err,result) =>{
