@@ -1,11 +1,8 @@
 const express = require("express");
-const {sequelize, users} = require("./models"); // import models
 const bodyparser = require("body-parser");
 const dbconnection = require("./connection/db");
-const user = require("./api/user");
-const bcrypt = require("bcryptjs");
-const path = require("path");
-const cors = require("cors");
+const user = require("./router/user");
+const app = express();
 
 //dbconnection varification
 dbconnection.authenticate()
@@ -17,23 +14,19 @@ dbconnection.authenticate()
     console.log("Database connection NOT estamblished!!!",err);
 })
 
-const app = express();
 app.use(bodyparser.json());
-
-// app.use("/",user);
-app.unsubscribe(bodyparser.urlencoded(
-    {
+app.unsubscribe(bodyparser.urlencoded({
         extended:true
     }))
 
-app.use(express.json());
+//Calling The Routers
 app.use("/",user);
-app.get("/", function (req, res) {
-    res.json({message});
+
+app.get('/', function (req, res) {
+    res.send("App Running👌👌👌");
 });
 
-
-
+//lisignig port
 app.listen({port: 5005}, async() =>{
     // await sequelize.authenticate();
 });
