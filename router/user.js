@@ -33,7 +33,7 @@ router.post("/signup", (req,res) =>{
                 //Inserting the User 
                 try{
                     const user =  User.create({name, surname,email, password: bcrypt.hashSync(req.body.password, 8),passcorn: bcrypt.hashSync(req.body.password, 8)});
-                    return res.json({message:"User Registered Sucessfully!!!"});
+                    return res.json({message:"User Registered Sucessfully👌👌👌"});
                 }catch(err){
                     return res.status(500).json(err);
                 }
@@ -71,19 +71,32 @@ router.put("/update/:id", async(req,res) =>{
                 return res.json({message:"Password does not match!!!"});
              }else{
                 //email check
-                if (users.email == req.body.email) {
+                const dbEmail = User.findAll({
+                    where:{
+                        email: req.body.email
+                    }
+                }).then(err=>{
+                      if (err) {
                     return res.json({message:"Email Already Taken/Signed Up🚀🚀🚀"})
-                }else{
-                    try{
+                    }else{
                         users.password = bcrypt.hashSync(req.body.password, 8);
                         users.passcorn = bcrypt.hashSync(req.body.password, 8); 
                         users.save();
-                        return res.json({message:"User Updated Sucessfully👌👌👌"});
-                
-                    }catch(err){
-                        return res.status(500).json({err: "An error occured"});
-                    }
-                }
+                         return res.json({message:"User Updated Sucessfully👌👌👌"});
+                }});
+                // const dbEmail = User.findOne({
+                //     where: {
+                //       email: users.email
+                //     } 
+                //   }).then(err=>{
+                //       if (email == dbEmail) {
+                //     return res.json({message:"Email Already Taken/Signed Up🚀🚀🚀"})
+                //     }else{
+                //         users.password = bcrypt.hashSync(req.body.password, 8);
+                //         users.passcorn = bcrypt.hashSync(req.body.password, 8); 
+                //         users.save();
+                //          return res.json({message:"User Updated Sucessfully👌👌👌"});
+                // }});
                
              }
         }
