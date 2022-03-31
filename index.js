@@ -4,6 +4,7 @@ const cors = require('cors');
 const mysql = require('mysql2'); 
 const { response } = require('express');
 
+
 const app = express();
 
 
@@ -36,10 +37,12 @@ db.connect(err =>{
 
 /*
 
-app.get('/admin', (req, res) =>{
+app.get('/adminLoadFile', (_req, _res) =>{
     
 
-    let qr = 'select email, password, admin_name FROM admin ';
+    let qr = `select COUNT(fullName)  FROM application `;
+    var names = [];
+    const counts:any;
     db.query(qr, (err, result) => {
 
         if(err)
@@ -47,22 +50,104 @@ app.get('/admin', (req, res) =>{
             console.log(err,'errs');
         }
         if(result.length >0)
-        {
-            res.send({
+        { 
+            counts = result.length;
 
-                message: 'loged in',
-                data:result
-            });
+            while (counts >0){
 
-          
+                let qr = `select surname  FROM application WHERE id = ${counts} `;
+                db.query(qr, (_err, _result) => {
+
+
+                    if(err)
+                    {
+                        console.log(err,'errs');
+                    }
+                    if(result.length >0)
+                    { 
+                        names[i] = _result ;
+                        console.log(names[i]);
+                        
+                    }
+
+                 // show data
+                //console.log(names);
+
+            
+                ///names.push(i);
+    
+
+                
+
+                });
+
+                counts++;
+            }
+           
+            
+
+  
         }
     });
 
 
     
 });
+
 */
 
+
+//get all data from database to front
+
+app.get('/adminLoadFile', (_req, _res) =>{
+    
+
+    let qr = `select *  FROM application `;
+   
+    
+    db.query(qr, (err, result) => {
+
+        if(err)
+        {
+            console.log(err,'errs');
+        }
+        if(result.length >0)
+        { 
+           
+                
+                      
+            _res.send({
+
+                message: 'data retrieved ',
+                data:result
+
+            
+            });
+            return
+                
+
+                
+        }else{
+
+         
+            _res.send({
+
+                message: 'Not retieved'
+                
+
+            
+            });
+            return
+         
+        }
+           
+            
+
+  
+        }
+    );
+
+});
 
 app.post('/login', (req, res) =>{
 
@@ -174,26 +259,46 @@ app.post('/notice', (req, res) =>{
 
 */
 
-app.post('/registration', (req, res) =>{
+app.post('/registrations', (req, res) =>{
 
+
+    
+
+    ///let sql2 = "SELECT emailAddress from application";
+
+
+    // if( sql2 ==stEmail)
+    // {
+
+    //     res.send({
+
+    //         message: 'Email already exist',
+    //         data:result
+
+        
+    //     });
+
+
+    // }
+    
+    
     console.log(req.body,'LoadToRagistration');
 
-    let names = req.body.fullnam;
+    let fullName = req.body.fullName;
     let surname = req.body.surname;
     let gender = req.body.gender;
-    let dateBirth = req.body.dateBirth;
-    let stEmail = req.body.stEmail;
-    let password = req.body.password;
-    let institute = req.body.institute;
-    let proof = req.body.proof;
-    let mNumber = req.body.mNumber;
+    let dateOfBirth = req.body.dateOfBirth;
+    let emailAddress = req.body.emailAddress;
+    let institution = req.body.institution;
+    let academicRecord = req.body.academicRecord;
+    let mobileNumber = req.body.mobileNumber;
     let skills = req.body.skills;
-    let stat = req.body.stat;
+   
     
 
 
  
-    let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${names}","${surname}", "${gender}", "${dateBirth}","${stEmail}","${institute}","${proof}","${mNumber}","${skills}") `;
+    let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${fullName}","${surname}", "${gender}", "${dateOfBirth}","${emailAddress}","${institution}","${academicRecord}","${mobileNumber}","${skills}") `;
 
     
     db.query(sql1,(err,result) =>{
@@ -205,11 +310,9 @@ app.post('/registration', (req, res) =>{
 
             return
         }
-/*
-        if(result.length >0)
-        {
-          
-            res.send({
+        else{
+
+                        res.send({
 
                 message: 'Application Successfully submited',
                 data:result
@@ -217,30 +320,15 @@ app.post('/registration', (req, res) =>{
             
             });
             return
-            
-        }
 
-        */
-        
+        }      
 
-         
-            res.send({
-
-                message: 'Application Successfully submited',
-                data:result
-
-            
-            });
-            return
          
         
     });
-      return  
-
+     
        
 });
-
-
 
 app.listen(9002,() =>{
 
