@@ -123,7 +123,7 @@ router.put("/updateUser/:id", (req,res) =>{
                                             res.json({message:"User successfully Updated✔✔✔"});
                                             return;
                                         }
-                                       });                                         
+                                       });
                             }
                         }
                 });    
@@ -135,15 +135,27 @@ router.put("/updateUser/:id", (req,res) =>{
 //Delete user
 router.delete("/deleteUser/:id",(req,res) =>{
     let id = req.params.id;
-    let delete_sql = `DELETE * FROM users WHERE id = "${id}"`;
-    dataBase.query(delete_sql,(err,result) =>{
+    const { name, surname,email} = req.body; 
+    dataBase.password = bcrypt.hashSync(req.body.password, 8);
+    dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
+    let create_sql = `INSERT INTO deletedusers( name, surname, email, password, passcorn) VALUES ("${name}","${surname}", "${email}", "${dataBase.password}","${dataBase.passcorn}")`;
+    dataBase.query(create_sql,(err,result) =>{
         if(err){
-            console.log('Unable to delete user data!!!');
+            console.log(err,'Unable to delete user data!!!');
             res.json({Message:"Unable to delete!!!"});
             return;
         }else{
-            res.json({message:"User successfully deleted✔✔✔"});
-            return;
+            let delete_sql = `DELETE  FROM users WHERE id = "${id}"`;
+            dataBase.query(delete_sql,(err,result) =>{
+                if(err){
+                    console.log(err,'Unable to delete user data!!!');
+                    res.json({Message:"Unable to delete!!!"});
+                    return;
+                }else{
+                    res.json({message:"User successfully deleted✔✔✔"});
+                    return;
+                }
+            });
         }
        });
 });
