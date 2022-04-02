@@ -9,9 +9,11 @@ The "Read announcement" request which will request for the data in the database.
 * [Postman.js](https://Postman.org/)
 * [xampp](https://xampp.org/)
 <p align="right">(<a href="#top">back to top</a>)</p>
+
 ## Getting Started:
 Still going to find out "How to make local database to be accessed over the internet", but if you have xampp you can open "xampp control panel" and start "Apache" and "Mysql" and go to the browser and create your database.Open "command-cli" from where you want to clone this project
 <p align="right">(<a href="#top">back to top</a>)</p>
+
 ### Always run this commund after cloning to install node_models
 1. Clone the repository by running this command on gitbash:
    ```sh
@@ -26,11 +28,12 @@ Still going to find out "How to make local database to be accessed over the inte
    npm install Name of indepency
    ```
 <p align="right">(<a href="#top">back to top</a>)</p> 
+
 ## Challange:
 Sending email with a jsontowken that will aske the user to varify emial
 <p align="right">(<a href="#top">back to top</a>)</p>
-## Contact
 
+## Contact
 Lindelani Mthethwa - [https://web.facebook.com/lindelani.mthethwa.142](https://web.facebook.com/lindelani.mthethwa.142) - lindelani4435@gmail.com
 
 Project Link: [https://github.com/ICEP-DEV/2022_TVH_BE](https://github.com/ICEP-DEV/2022_TVH_BE)
