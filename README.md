@@ -1,8 +1,10 @@
 # 2022_TVH_BE
 ## About The Project
-I created the endposts which will respond to the requests that are made in the front end and serve the response back to the front end.The request for "Sign Up", were the user must enter data which will be stored in the database for later analysis.The request for "Log In", were the user must enter data in order to have access to home page but before home user data must be match the data in the database.The request for "create announcement", were user will be requesting to enter data into the database via the front end commponent.
+I created the endpoints which will respond to the requests that are made in the front end and serve the response back to the front end.The request for "Sign Up", were the user must enter data which will be stored in the database for later analysis.The request for "Log In", were the user must enter data in order to have access to home page but before home user data must be match the data in the database.The request for "create announcement", were user will be requesting to enter data into the database via the front end commponent.
 
-The "Read announcement" request which will request for the data in the database.The "Update announcement" request which will request to manipulate data in the database.The "delete announcement" which will basically request to move data from one table in the database to another table within same database 
+The "Read announcement" request which will request for the data in the database.The "Update announcement" request which will request to manipulate data in the database.The "delete announcement" which will basically request to move data from one table in the database to another table within same database
+
+I also created the response endpoint which sends an "Application verification email" to the participant after he/she has done filling the application form and click "submit" 
 
 ## Built with:
 * [node.js](https://nodejs.org/)
