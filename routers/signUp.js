@@ -134,7 +134,7 @@ router.put("/updateUser/:id", (req,res) =>{
 
 //Delete user
 router.delete("/deleteUser/:id",(req,res) =>{
-    let id = req.params.id;
+    let id = req.params.participant_id;
     const { name, surname,email} = req.body; 
     dataBase.password = bcrypt.hashSync(req.body.password, 8);
     dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);

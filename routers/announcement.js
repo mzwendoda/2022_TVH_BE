@@ -77,6 +77,7 @@ router.delete("/deleteAnnouncement/:id", (req,res) =>{
     let create_sql =`INSERT INTO deletedannouncements(announcement_name, announcement_body, annoucement_link) VALUES ('${announcement_name}','${announcement_body}','${announcement_link}')`;
     dataBase.query(create_sql,(err,result) =>{
         if(err){
+            console.log(this.create_sql);
             console.log(err,'errs');
             res.json({Message:"Unable to store deleted anouncement!!!"});
             return;
