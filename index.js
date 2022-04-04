@@ -330,6 +330,78 @@ app.post('/registrations', (req, res) =>{
        
 });
 
+
+////signup
+
+app.post("/signUp", (req,res) =>{
+    const { firstName, lastName,emailAddress,password} = req.body     
+        //Filled Validation
+        if(firstName == undefined||firstName==""||lastName==undefined||lastName==""||
+        emailAddress==undefined||emailAddress==""||password==undefined||password==""){
+            return res.json({message:"All fields are required!!!"});
+       
+        }
+        else{
+                //Email Validation
+                let select_sql =`SELECT emailAddress from users_account WHERE emailAddress = "${emailAddress}"`;
+                dataBase.query(select_sql,(err,result) =>{
+                    if(err){
+                        console.log(err,'errs');
+                        res.json({Message:"Problem with table!!!!"});
+                        return;
+                        }else{
+                            if(result.length>0)
+                            {
+                                console.log('Email stored in the databse!!!');
+                                res.json({message:"Email already signed up!!!"});
+                                return;
+                            }else{
+                                dataBase.password = bcrypt.hashSync(req.body.password, 8); 
+                                dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
+                                //Inserting a user to users database
+                                let insert_sql =`INSERT INTO users( firstName, lastName, emailAddress, password) VALUES ("${firstName}","${lastName}", "${emailAddress}", "${password}")`;
+                                       dataBase.query(insert_sql,(err,result) =>{
+                                        if(err){
+                                            console.log(err,'errs');
+                                            res.json({Message:"Unable to signup!!!"});
+                                            return;
+                                        }else{
+                                            res.json({message:"User signed Up successfully✔✔✔"});
+                                            return;
+                                        }
+                                       });                                         
+                            }
+                        }
+                });    
+             }
+
+        
+    });
+
+
+/////Login?user
+
+app.get("/userLogin", (req,res) =>{
+    const{emailAddress, password} = req.body;
+    
+        let select_sql =`SELECT emailAddress ,password from users_account WHERE email = "${emailAddress}" and password ="${password}`;
+        dataBase.query(select_sql,(err,result) =>{
+                if(err){
+                    console.log('Wrong password or Email!!!!');
+                    res.json({Message:"User unable to signIn(email/password is Incorrect)!!!!"});
+                    return;
+                }else{
+                    if(result.length>0){
+                        res.json({message:"User sucessfully signed In✔✔✔"});
+                        return;
+                    }
+                }
+        });    
+    
+});
+
+
+
 app.listen(9002,() =>{
 
     console.log('server running....');
