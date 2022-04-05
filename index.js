@@ -3,9 +3,15 @@ const bodypaser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2'); 
 const { response } = require('express');
+const fileupload = require('express-fileupload')
+const path = require('path');
+const util = require('util');
 
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(fileupload());
 
 
 app.use(cors());
@@ -149,6 +155,9 @@ app.get('/adminLoadFile', (_req, _res) =>{
 
 });
 
+
+////Admin login
+
 app.post('/login', (req, res) =>{
 
     console.log(req.body,'loginbox');
@@ -280,6 +289,8 @@ app.post('/registrations', (req, res) =>{
 
 
     // }
+
+
     
     
     console.log(req.body,'LoadToRagistration');
@@ -293,40 +304,89 @@ app.post('/registrations', (req, res) =>{
     let academicRecord = req.body.academicRecord;
     let mobileNumber = req.body.mobileNumber;
     let skills = req.body.skills;
+
+
+    if(req.academicRecord){
+
+        console.log(req.academicRecord)
+        var file = req.academicRecord.file
+        var filename = file.name
+        console.log(filename)
+
+        file.mv('./public/'+ filename, function(err){
+
+            if(err){
+                res.send(err)
+            }else{
+
+                res.send("file uploaded")
+            }
+        })
+    }
+
+
+    
    
-    
 
+    //let sql = `SELECT emailAddress from application  WHERE emailAddress == ${emailAddress}`;
 
- 
-    let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${fullName}","${surname}", "${gender}", "${dateOfBirth}","${emailAddress}","${institution}","${academicRecord}","${mobileNumber}","${skills}") `;
+   // db.query(sql,(err,result) =>{
 
-    
-    db.query(sql1,(err,result) =>{
+      //  if(err)
+      //  {
+      //      console.log(err, 'errs');
+      //      return;
+      //  }
+      //  else if(result.length>0){
 
-        
-        if(err)
-        {
-            console.log(err,'errs');
+      //      res.send({
 
-            return
-        }
-        else{
-
-                        res.send({
-
-                message: 'Application Successfully submited',
-                data:result
+       //         message: 'Email already exist on our system, please enter different email',
+      //          data:result
 
             
-            });
-            return
+      //      });
 
-        }      
+      //  }
+       // else
+       // {
 
-         
+            let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${fullName}","${surname}", "${gender}", "${dateOfBirth}","${emailAddress}","${institution}","${academicRecord}","${mobileNumber}","${skills}") `;
+
+    
+            db.query(sql1,(err,result) =>{
         
-    });
-     
+                
+                if(err)
+                {
+                    console.log(err,'errs');
+        
+                    return
+                }
+                else{
+        
+                                res.send({
+        
+                        message: 'Application Successfully submited',
+                        data:result
+        
+                    
+                    });
+                    return
+        
+                }      
+        
+                 
+                
+            });
+             
+
+
+       // }
+        
+    //})
+ 
+
        
 });
 
@@ -399,6 +459,78 @@ app.get("/userLogin", (req,res) =>{
         });    
     
 });
+
+
+//Testing to upload pdf file
+
+app.post("/upload", async (req, res) => {
+
+	try{
+	
+	const file = req.files.file;
+	const fileName = file.name;
+	const size = file.data.length;
+	const extension = path.extname(fileName);
+	
+	const allowedExtensions = /pdf|jpg|png/;
+	
+	if(!allowedExtensions.test(extension)) throw "Unsupported extension";
+	if(size > 5000000) throw "File must be less than 5MB"
+	
+	const md5 = file.md5;
+	const URL = "/uploads/" + md5 + extension;
+	
+	await util.promisify(file.mv)("./public" + URL);
+	
+	res.json({
+	
+		message: "File uploaded successfully",
+	})
+	
+	
+	}catch(err){
+	
+	console.log(err)
+	res.status(500).json({
+	
+	message: err,
+	
+	});
+	
+	
+	}
+
+
+});
+//////////end of pdf file upload
+
+
+//2nd post pdf
+
+app.post('/pdf', (req, res) =>{
+
+    if(req.files){
+
+        console.log(req.files)
+        var file = req.files.file
+        var filename = file.name
+        console.log(filename)
+
+        file.mv('./public/'+ filename, function(err){
+
+            if(err){
+                res.send(err)
+            }else{
+
+                res.send("file uploaded")
+            }
+        })
+    }
+})
+
+//end
+
+
 
 
 
