@@ -1,11 +1,12 @@
 const express = require('express');
 const bodypaser = require('body-parser');
-const signUp = require('./routers/signUp');
-const signIn = require("./routers/signIn");
+const SignUp = require('./routers/signUp');
+const SignIn = require("./routers/signIn");
 const Announcement = require("./routers/announcement");
 const Registration = require("./routers/application");
 const Accepted = require("./routers/acceptedParticipant");
-const Rejected = require("./routers/rejectedParticipant")
+const Rejected = require("./routers/rejectedParticipant");
+const Forgotpassword = require("./routers/forgotpassword");
 const app = express();
 
 app.use(bodypaser.json());
@@ -19,12 +20,13 @@ app.use(function (req, res, next) {
     next();    
   });
 
-app.post("/",signUp);
-app.use("/",signIn);
+app.use("/",SignUp);
+app.use("/",SignIn);
 app.use("/",Announcement);
 app.use("/",Registration);
 app.use("/",Accepted);
 app.use("/",Rejected);
+app.use("/",Forgotpassword);
 app.use('/', function(res, res){
     res.send("App Running👌👌👌(PostMan check routers)")
 });

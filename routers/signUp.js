@@ -30,10 +30,8 @@ router.post("/signUp", (req,res) =>{
                                 res.json({message:"Email already signed up!!!"});
                                 return;
                             }else{
-                                dataBase.password = bcrypt.hashSync(req.body.password, 8); 
-                                dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
                                 //Inserting a user to users database
-                                let insert_sql =`INSERT INTO users( name, surname, email, password, passcorn) VALUES ("${name}","${surname}", "${email}", "${dataBase.password}","${dataBase.passcorn}")`;
+                                let insert_sql =`INSERT INTO users( name, surname, email, password, passcorn) VALUES ("${name}","${surname}", "${email}", "${password}","${passcorn}")`;
                                        dataBase.query(insert_sql,(err,result) =>{
                                         if(err){
                                             console.log(err,'errs');
@@ -134,7 +132,7 @@ router.put("/updateUser/:id", (req,res) =>{
 
 //Delete user
 router.delete("/deleteUser/:id",(req,res) =>{
-    let id = req.params.participant_id;
+    let id = req.params.id;
     const { name, surname,email} = req.body; 
     dataBase.password = bcrypt.hashSync(req.body.password, 8);
     dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
