@@ -4,13 +4,13 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 
 router.post("/createAnnouncement", (req,res) =>{
-    const { announcement_name,announcement_body, announcement_link} = req.body;
+    const { announcement_name,announcement_body} = req.body;
     
-    if(announcement_name == undefined||announcement_name==""||announcement_body==undefined||announcement_body==""||
-    announcement_link==undefined||announcement_link==""){
+    if(announcement_name == undefined||announcement_name==""||
+    announcement_body==undefined||announcement_body==""){
             return res.json({message:"All fields are required!!!"});
         }else{
-            let create_sql =`INSERT INTO announcements( announcement_name, announcement_body, announcement_link) VALUES ("${announcement_name}","${announcement_body}", "${announcement_link}")`;
+            let create_sql =`INSERT INTO announcements( announcement_name, announcement_body) VALUES ("${announcement_name}","${announcement_body}")`;
             dataBase.query(create_sql,(err,result) =>{
                 if(err){
                     console.log(err,'errs');
@@ -55,9 +55,9 @@ router.get("/readAnnouncement/:id", (req,res) =>{
 
 router.put("/updateAnnouncement/:id", (req,res) =>{
     let announcement_id = req.params.id;
-    const { announcement_name,announcement_body, announcement_link} = req.body;
+    const { announcement_name,announcement_body} = req.body;
     
-    let update_sql   = `UPDATE announcements SET announcement_name='${announcement_name}',announcement_body='${announcement_body}',announcement_link='${announcement_link}' WHERE announcement_id='${announcement_id}'`;
+    let update_sql   = `UPDATE announcements SET announcement_name='${announcement_name}',announcement_body='${announcement_body}' WHERE announcement_id='${announcement_id}'`;
     dataBase.query(update_sql,(err,result) =>{
         if(err){
             console.log(err,'Unable to update announcement information!!!');
@@ -73,27 +73,16 @@ router.put("/updateAnnouncement/:id", (req,res) =>{
 router.delete("/deleteAnnouncement/:id", (req,res) =>{
 
     let announcement_id = req.params.id;
-    const { announcement_name,announcement_body, announcement_link} = req.body;
-    let create_sql =`INSERT INTO deletedannouncements(announcement_name, announcement_body, annoucement_link) VALUES ('${announcement_name}','${announcement_body}','${announcement_link}')`;
-    dataBase.query(create_sql,(err,result) =>{
-        if(err){
-            console.log(this.create_sql);
-            console.log(err,'errs');
-            res.json({Message:"Unable to store deleted anouncement!!!"});
-            return;
-        }else{
-            let delete_sql = `DELETE FROM announcements WHERE announcement_id = '${announcement_id}'`;
+    let delete_sql = `DELETE FROM announcements WHERE announcement_id = '${announcement_id}'`;
             dataBase.query(delete_sql,(err,result) =>{
                 if(err){
-                    console.log(err,'Unable to delete user data!!!');
-                    res.json({Message:"Unable to delete!!!"});
+                    console.log(err,'Unable to delete announcement data!!!');
+                    res.json({Message:"Unable to delete announcements!!!"});
                     return;
                 }else{
-                    res.json({message:"User successfully deleted✔✔✔"});
+                    res.json({message:"Announcement successfully deleted✔✔✔"});
                     return;
                 }
             });
-        }
-    })
 });
 module.exports = router;

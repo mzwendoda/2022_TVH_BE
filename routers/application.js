@@ -5,16 +5,19 @@ const bcrypt = require("bcrypt");
 
 
 router.post("/apply", (req,res) =>{
-    const {pName,pSurname,pGender,pDob,pemail,pRecord,pCellNo,pSkill} = req.body     
+    const {student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno,student_faculty,specialization,student_level,student_campus,student_hobby} = req.body     
         //Filled Validation
-        if(pName == undefined||pName==""||pSurname==undefined||pSurname==""||
-        pGender==undefined||pGender==""||pDob==undefined||pDob==""||
-        pemail==undefined||pemail==""||pRecord==undefined||pRecord==""||pCellNo==undefined||pCellNo==""||
-        pSkill==undefined||pSkill==""){
+        if(student_number == undefined||student_number==""||student_name==undefined||student_name==""||
+        student_surname==undefined||student_surname==""||student_gender==undefined||student_gender==""||
+        student_dob==undefined||student_dob==""||student_email==undefined||student_email==""||
+        student_cellno==undefined||student_cellno==""||student_faculty==undefined||student_faculty==""||
+        specialization==undefined||specialization==""||student_level==undefined||student_level==""||
+        student_campus==undefined||student_campus==""||
+        student_hobby==undefined||student_hobby==""){
             return res.json({message:"All fields are required!!!"});
         }else{
             //Email Validation
-            let select_sql =`SELECT pemail from participants WHERE pemail = "${pemail}"`;
+            let select_sql =`SELECT student_email from applications WHERE student_email = "${student_email}"`;
             dataBase.query(select_sql,(err,result) =>{
                 if(err){
                     console.log(err,'errs');
@@ -26,43 +29,48 @@ router.post("/apply", (req,res) =>{
                         res.json({message:"Email already signed up!!!"});
                         return;
                     }else{
-                        // dataBase.password = bcrypt.hashSync(req.body.password, 8); 
-                        // dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
-                        //Inserting a user to users database
-                        let insert_sql =`INSERT INTO participants( pName,pSurname,pGender,pDob,pemail,pRecord,pCellNo,pSkill) VALUES("${pName}","${pSurname}", "${pGender}", "${pDob}","${pemail}","${pRecord}","${pCellNo}","${pSkill}")`;
+                        let insert_sql =`INSERT INTO applications( student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno,student_faculty,specialization,student_level,student_campus,student_hobby)`
+                                    +   `\nVALUES("${student_number}","${student_name}", "${student_surname}", "${student_gender}","${student_dob}","${student_email}","${student_cellno}","${student_faculty}","${specialization}","${student_level}","${student_campus}","${student_hobby}")`;
                         dataBase.query(insert_sql,(err,result) =>{
                             if(err){
                                 console.log(err,'errs');
                                 res.json({Message:"Unable to capture application!!!"});
                                 return;
                             }else{
-                                res.json({message:"Application successfully captured✔✔✔"});
-    
-                                var nodemailer = require('nodemailer');
-                                let transporter = nodemailer.createTransport({
-                                    service:'gmail',
-                                    host: 'smtp.gmail.com',
-                                    port:'587',
-                                    auth:{
-                                        user: 'gunman4435@gmail.com',
-                                        pass: 'Mthethwa@4435'
-                                    },
-                                    secureConnection: 'false',
-                                    tls: {
-                                        ciphers: 'SSLv3',
-                                        rejectUnauthorized: false
-                                    }
-                                  }); 
+                                let update_sql   = `UPDATE applications SET application_status='Panding!!!!'`;
+                                dataBase.query(update_sql,(err,result) =>{
+                                    if(err){
+                                        console.log('Unable to update application status!!!');
+                                        res.json({Message:"Unable to update!!!"});
+                                        return;
+                                    }else{
+                                        res.json({message:"Application successfully captured✔✔✔"});
+                                        var nodemailer = require('nodemailer');
+                                        let transporter = nodemailer.createTransport({
+                                            service:'gmail',
+                                            host: 'smtp.gmail.com',
+                                            port:'587',
+                                            auth:{
+                                                user: 'gunman4435@gmail.com',
+                                                pass: 'Mthethwa@4435'
+                                            },
+                                            secureConnection: 'false',
+                                            tls: {
+                                                ciphers: 'SSLv3',
+                                                rejectUnauthorized: false
+                                            }
+                                    }); 
                                  
-                                 message ={
+                                    message ={
 
                                     from:'gunman4435@gmail.com',
-                                    to:JSON.stringify(pemail),
+                                    to:JSON.stringify(student_email),
                                     subject:'No reply :TVH Application',
                                     text: ( 'You Have successfully applied  for TVH ' 
-                                     +'\n participant Name : '+ pName
-                                    +'\n participant Surname     : ' + pSurname
-                                    +'\n participant Skill     : ' + pSkill 
+                                     +'\n participant Name : '+ student_name
+                                    +'\n participant Surname     : ' + student_surname
+                                    +'\n participant specialization     : ' + specialization
+                                    +'\n application status         : '+ 'Panding!!!' 
                                     +'\n\n\n If your application is succesfull you will hear from us,' 
                                     +'\n if not please apply next time')
                                 };
@@ -73,6 +81,9 @@ router.post("/apply", (req,res) =>{
                                       } else {
                                         console.log(info);
                                       }   
+                                });
+                                        return;
+                                 }
                                 });
 
                                 return;
@@ -85,44 +96,5 @@ router.post("/apply", (req,res) =>{
 
         }
     });
-
-    router.get("/viewApplications", (req,res) =>{
-        let read_sql = "Select * From participants";
-        dataBase.query(read_sql,(err,result) =>{
-            if(err){
-                console.log('Unable to Read data from the databse');
-                res.json({Message:"Unable to read data!!!"});
-                return;
-            }else{
-                res.json({message:"Registration data successfully fetched✔✔✔",data:result});
-                return;
-            }
-           });
-    });
-   
-    //Delete user
-    router.delete("/deleteApplication/:id",(req,res) =>{
-        let participant_id = req.params.id;
-        const { pName,pSurname,pGender,pDob,pemail,pRecord,pCellNo,pSkill} = req.body; 
-        let create_sql = `INSERT INTO deleteparticipants( pName,pSurname,pGender,pDob,pemail,pRecord,pCellNo,pSkill) VALUES ("${pName}","${pSurname}", "${pGender}", "${pDob}","${pemail}","${pRecord}","${pCellNo}","${pSkill}")`;
-        dataBase.query(create_sql,(err,result) =>{
-            if(err){
-                console.log(err,'Unable to delete registration data!!!');
-                res.json({Message:"Unable to delete!!!"});
-                return;
-            }else{
-                let delete_sql = `DELETE  FROM participants WHERE participant_id = "${participant_id}"`;
-                dataBase.query(delete_sql,(err,result) =>{
-                    if(err){
-                        console.log(err,'Unable to delete registration data!!!');
-                        res.json({Message:"Unable to delete!!!"});
-                        return;
-                    }else{
-                        res.json({message:"Registration successfully deleted✔✔✔"});
-                        return;
-                    }
-                });
-            }
-           });
-    });
+    
     module.exports = router;
