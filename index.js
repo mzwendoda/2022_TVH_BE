@@ -25,7 +25,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password:'',
-    database: 'tvhweb',
+    database: 'tvhdb',
     port:3306
 })
 
@@ -108,7 +108,7 @@ app.get('/adminLoadFile', (_req, _res) =>{
 app.get('/adminLoadFile', (_req, _res) =>{
     
 
-    let qr = `select *  FROM application `;
+    let qr = `select *  FROM applications `;
    
     
     db.query(qr, (err, result) => {
@@ -163,11 +163,11 @@ app.post('/login', (req, res) =>{
     console.log(req.body,'loginbox');
 
  
-    let eml = req.body.emal;
-    let pass = req.body.passw;
+    let admin_email = req.body.admin_email;
+    let admin_password = req.body.admin_password;
 
  
-    let sql1 =`SELECT email, password from admin WHERE email = "${eml}" AND password = "${pass}" `;
+    let sql1 =`SELECT admin_email, admin_password from administrator WHERE admin_email = "${admin_email}" AND admin_password = "${admin_password}" `;
 
     
     db.query(sql1,(err,result) =>{
@@ -268,124 +268,114 @@ app.post('/notice', (req, res) =>{
 
 */
 
+
+///Registration Form
+
 app.post('/registrations', (req, res) =>{
 
-
-    
-
-    ///let sql2 = "SELECT emailAddress from application";
-
-
-    // if( sql2 ==stEmail)
-    // {
-
-    //     res.send({
-
-    //         message: 'Email already exist',
-    //         data:result
-
-        
-    //     });
-
-
-    // }
-
-
-    
-    
     console.log(req.body,'LoadToRagistration');
 
-    let fullName = req.body.fullName;
-    let surname = req.body.surname;
-    let gender = req.body.gender;
-    let dateOfBirth = req.body.dateOfBirth;
-    let emailAddress = req.body.emailAddress;
-    let institution = req.body.institution;
-    let academicRecord = req.body.academicRecord;
-    let mobileNumber = req.body.mobileNumber;
-    let skills = req.body.skills;
 
 
-    if(req.academicRecord){
-
-        console.log(req.academicRecord)
-        var file = req.academicRecord.file
-        var filename = file.name
-        console.log(filename)
-
-        file.mv('./public/'+ filename, function(err){
-
+    const {student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno, participant_skills,student_faculty,specialization,student_level,student_campus,student_hobby} = req.body     
+    //Filled Validation
+    if(student_number == undefined||student_number==""||student_name==undefined||student_name==""||
+    student_surname==undefined||student_surname==""||student_gender==undefined||student_gender==""||
+    student_dob==undefined||student_dob==""||student_email==undefined||student_email==""||
+    student_cellno==undefined||student_cellno==""||participant_skills==undefined||participant_skills==""||student_faculty==undefined||student_faculty==""||
+    specialization==undefined||specialization==""||student_level==undefined||student_level==""||
+    student_campus==undefined||student_campus==""||
+    student_hobby==undefined||student_hobby==""){
+        return res.json({message:"All fields are required!!!"});
+    }else{
+        //Email Validation
+        let select_sql =`SELECT student_email from applications WHERE student_email = "${student_email}"`;
+        db.query(select_sql,(err,result) =>{
             if(err){
-                res.send(err)
+                console.log(err,'errs');
+                res.json({Message:"Problem with table!!!!"});
+                return;
             }else{
+                if(result.length>0){
+                    console.log('Email stored in the databse!!!');
+                    res.json({message:"Email already signed up!!!"});
+                    return;
+                }else{
+                    let insert_sql =`INSERT INTO applications( student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno, participant_skills,student_faculty,specialization,student_level,student_campus,student_hobby)`
+                                +   `\nVALUES("${student_number}","${student_name}", "${student_surname}", "${student_gender}","${student_dob}","${student_email}","${student_cellno}", "${participant_skills}","${student_faculty}","${specialization}","${student_level}","${student_campus}","${student_hobby}")`;
+                    db.query(insert_sql,(err,result) =>{
+                        if(err){
+                            console.log(err,'errs');
+                            res.json({Message:"Unable to capture application!!!"});
+                            return;
+                        }else{
+                            let update_sql   = `UPDATE applications SET application_status='Panding!!!!'`;
+                            db.query(update_sql,(err,result) =>{
+                                if(err){
+                                    console.log('Unable to update application status!!!');
+                                    res.json({Message:"Unable to update!!!"});
+                                    return;
+                                }else{
+                                    res.json({message:"Application successfully captured✔✔✔"});
+                                    var nodemailer = require('nodemailer');
+                                    let transporter = nodemailer.createTransport({
+                                        service:'gmail',
+                                        host: 'smtp.gmail.com',
+                                        port:'587',
+                                        auth:{
+                                            user: 'gunman4435@gmail.com',
+                                            pass: 'Mthethwa@4435'
+                                        },
+                                        secureConnection: 'false',
+                                        tls: {
+                                            ciphers: 'SSLv3',
+                                            rejectUnauthorized: false
+                                        }
+                                }); 
+                             
+                                message ={
 
-                res.send("file uploaded")
+                                from:'gunman4435@gmail.com',
+                                to:JSON.stringify(student_email),
+                                subject:'No reply :TVH Application',
+                                text: ( 'You Have successfully applied  for TVH ' 
+                                 +'\n participant Name : '+ student_name
+                                +'\n participant Surname     : ' + student_surname
+                                +'\n participant specialization     : ' + specialization
+                                +'\n application status         : '+ 'Panding!!!' 
+                                +'\n\n\n If your application is succesfull you will hear from us,' 
+                                +'\n if not please apply next time')
+                            };
+
+                            transporter.sendMail(message,function(err, info) {
+                                if (err) {
+                                    console.log(err)
+                                  } else {
+                                    console.log(info);
+                                  }   
+                            });
+                                    return;
+                             }
+                            });
+
+                            return;
+                        }  
+                    });                                         
+                }
             }
-        })
+        });    
+         
+
     }
+
+
+
 
 
     
    
 
-    //let sql = `SELECT emailAddress from application  WHERE emailAddress == ${emailAddress}`;
-
-   // db.query(sql,(err,result) =>{
-
-      //  if(err)
-      //  {
-      //      console.log(err, 'errs');
-      //      return;
-      //  }
-      //  else if(result.length>0){
-
-      //      res.send({
-
-       //         message: 'Email already exist on our system, please enter different email',
-      //          data:result
-
-            
-      //      });
-
-      //  }
-       // else
-       // {
-
-            let sql1 =`INSERT INTO application( fullName,surname, gender, dateOfBirth, emailAddress, institution, academicRecord, mobileNumber, skills) VALUES ("${fullName}","${surname}", "${gender}", "${dateOfBirth}","${emailAddress}","${institution}","${academicRecord}","${mobileNumber}","${skills}") `;
-
-    
-            db.query(sql1,(err,result) =>{
-        
-                
-                if(err)
-                {
-                    console.log(err,'errs');
-        
-                    return
-                }
-                else{
-        
-                                res.send({
-        
-                        message: 'Application Successfully submited',
-                        data:result
-        
-                    
-                    });
-                    return
-        
-                }      
-        
-                 
-                
-            });
-             
-
-
-       // }
-        
-    //})
- 
+  
 
        
 });
@@ -394,17 +384,21 @@ app.post('/registrations', (req, res) =>{
 ////signup
 
 app.post("/signUp", (req,res) =>{
-    const { firstName, lastName,emailAddress,password} = req.body     
+
+
+
+    console.log(req.body,'signup');
+    const { name, surname,email,password} = req.body     
         //Filled Validation
-        if(firstName == undefined||firstName==""||lastName==undefined||lastName==""||
-        emailAddress==undefined||emailAddress==""||password==undefined||password==""){
+        if(name == undefined||name==""||surname==undefined||surname==""||
+        email==undefined||email==""||password==undefined||password==""){
             return res.json({message:"All fields are required!!!"});
        
         }
         else{
                 //Email Validation
-                let select_sql =`SELECT emailAddress from users_account WHERE emailAddress = "${emailAddress}"`;
-                dataBase.query(select_sql,(err,result) =>{
+                let select_sql =`SELECT email FROM users WHERE email = "${email}" `;
+                db.query(select_sql,(err,result) =>{
                     if(err){
                         console.log(err,'errs');
                         res.json({Message:"Problem with table!!!!"});
@@ -416,11 +410,11 @@ app.post("/signUp", (req,res) =>{
                                 res.json({message:"Email already signed up!!!"});
                                 return;
                             }else{
-                                dataBase.password = bcrypt.hashSync(req.body.password, 8); 
-                                dataBase.passcorn = bcrypt.hashSync(req.body.password, 8);
+                                //db.password = bcrypt.hashSync(req.body.password, 8); 
+                               // db.passcorn = bcrypt.hashSync(req.body.password, 8);
                                 //Inserting a user to users database
-                                let insert_sql =`INSERT INTO users( firstName, lastName, emailAddress, password) VALUES ("${firstName}","${lastName}", "${emailAddress}", "${password}")`;
-                                       dataBase.query(insert_sql,(err,result) =>{
+                                let insert_sql =`INSERT INTO users( name, surname, email, password) VALUES ("${name}","${surname}", "${email}", "${password}")`;
+                                       db.query(insert_sql,(err,result) =>{
                                         if(err){
                                             console.log(err,'errs');
                                             res.json({Message:"Unable to signup!!!"});
@@ -441,11 +435,14 @@ app.post("/signUp", (req,res) =>{
 
 /////Login?user
 
-app.get("/userLogin", (req,res) =>{
-    const{emailAddress, password} = req.body;
+app.post("/userLogin", (req,res) =>{
+
+
+    console.log(req.body,'UserLogin');
+    const{email, password} = req.body;
     
-        let select_sql =`SELECT emailAddress ,password from users_account WHERE email = "${emailAddress}" and password ="${password}`;
-        dataBase.query(select_sql,(err,result) =>{
+        let select_sql =`SELECT email ,password FROM users WHERE email = "${email}" AND password ="${password}"`;
+        db.query(select_sql,(err,result) =>{
                 if(err){
                     console.log('Wrong password or Email!!!!');
                     res.json({Message:"User unable to signIn(email/password is Incorrect)!!!!"});
@@ -454,6 +451,19 @@ app.get("/userLogin", (req,res) =>{
                     if(result.length>0){
                         res.json({message:"User sucessfully signed In✔✔✔"});
                         return;
+                    }
+                    else
+                    {
+
+                        res.send({
+
+                            message: 'Please check your email or password is incorrect',
+                            data:result
+            
+                        
+                        });
+                        return
+                        
                     }
                 }
         });    
@@ -529,6 +539,13 @@ app.post('/pdf', (req, res) =>{
 })
 
 //end
+
+
+///send email test
+
+
+
+//send email-end
 
 
 
