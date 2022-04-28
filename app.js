@@ -1,11 +1,8 @@
 const express = require('express');
 const bodypaser = require('body-parser');
-const User = require('./routers/user');
-const Announcement = require("./routers/announcement");
-const Application = require("./routers/application");
-const Administrator = require("./routers/administrator");
-const Forgotpassword = require("./routers/forgotpassword");
 const app = express();
+const Register = require("./routes/register");
+const Administrator = require("./routes/administrator");
 
 app.use(bodypaser.json());
 app.unsubscribe(bodypaser.urlencoded({extended:false}));
@@ -18,11 +15,8 @@ app.use(function (req, res, next) {
     next();    
   });
 
-app.use("/",User);
-app.use("/",Announcement);
-app.use("/",Application);
+app.use("/",Register);
 app.use("/",Administrator);
-app.use("/",Forgotpassword);
 app.use('/', function(res, res){
     res.send("App Running👌👌👌(PostMan check routers)")
 });
