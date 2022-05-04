@@ -230,7 +230,7 @@ router.post("/addTeamMember", (req,res) =>{
                                     text: ( 'You Have been successfully Accepted to participate in the TVH event' 
                                      +'\n\n Date and time will be communicated via this Email'
                                      +'\n\n Application status: ' + 'Accepted!!!'
-                                     +'\n\n\n Once again thank you for paricipating in this year Event💻💻🖥💻')
+                                     +'\n\n\n Once again thank you for paricipating in this year Event.')
                                 };
     
                                 transporter.sendMail(message,function(err, info) {
@@ -298,9 +298,9 @@ router.post("/addTeamMember", (req,res) =>{
                                     to:JSON.stringify(result),
                                     subject:'No reply :TVH Rejection',
                                     text: ( 'You Have been Rejected to participate in the TVH event' 
-                                     +'\n\n Please apply next time💻💻'
+                                     +'\n\n Please apply next time'
                                      +'\n\n Application status: ' + 'Rejected!!!'
-                                     +'\n\n\n Once again thank you for applying in this year Event💻💻🖥💻')
+                                     +'\n\n\n Once again thank you for applying in this year Event.')
                                 };
     
                                 transporter.sendMail(message,function(err, info) {
