@@ -181,4 +181,143 @@ router.post("/addTeamMember", (req,res) =>{
            });
     });
 
+    router.get("/acceptApplication/:id", (req,res) =>{
+        let application_id = req.params.id;
+        let read_sql = `Select * From applications`
+                    +`\n Where application_id = '${application_id}'`;
+        dataBase.query(read_sql,(err,result) =>{
+            if(err){
+                console.log('Unable to Read participant data from the databse');
+                res.json({Message:"Unable to read participant data announcements!!!"});
+                return;
+            }else{
+                let update_sql   = `UPDATE applications SET application_status='Accepted!!!!'`;
+                dataBase.query(update_sql,(err,result)=>{
+                    if (err) {
+                        console.log(err,"Error with sql code!!!");
+                        res.json({message:"Sql error!!!"});
+                    }else{
+                        console.log("Application accepted succefully");
+    
+                        let select_sql = `Select student_email From applications`
+                                +`\n  Where application_id = "${application_id}"`;
+                        dataBase.query(select_sql,(err,result)=>{
+                            if (err) {
+                                console.log("Unable to read email!!!");
+                                res.json({message:"Unable to send email!!!"});
+                            }else{
+                                var nodemailer = require('nodemailer');
+                                let transporter = nodemailer.createTransport({
+                                    service:'gmail',
+                                    host: 'smtp.gmail.com',
+                                    port:'587',
+                                    auth:{
+                                        user: 'tshwanevirtualhackathon@gmail.com',
+                                        pass: 'Tvh@0152'
+                                    },
+                                    secureConnection: 'false',
+                                    tls: {
+                                        ciphers: 'SSLv3',
+                                        rejectUnauthorized: false
+                                    }
+                                  }); 
+                                 
+                                 message ={
+    
+                                    from:'tshwanevirtualhackathon@gmail.com',
+                                    to:JSON.stringify(result),
+                                    subject:'No reply :TVH Acceptance',
+                                    text: ( 'You Have been successfully Accepted to participate in the TVH event' 
+                                     +'\n\n Date and time will be communicated via this Email'
+                                     +'\n\n Application status: ' + 'Accepted!!!'
+                                     +'\n\n\n Once again thank you for paricipating in this year Event💻💻🖥💻')
+                                };
+    
+                                transporter.sendMail(message,function(err, info) {
+                                    if (err) {
+                                        console.log(err)
+                                      } else {
+                                        console.log(info);
+                                      }  
+                                });
+                                res.json({message:"Acceptance Email Sent✔✔✔"});
+                            }
+                        })
+                    }
+                })
+                
+                return;
+            }
+           });
+    });
+
+    router.get("/rejectApplication/:id", (req,res) =>{
+        let application_id = req.params.id;
+        let read_sql = `Select * From applications`
+                    +`\n Where application_id = '${application_id}'`;
+        dataBase.query(read_sql,(err,result) =>{
+            if(err){
+                console.log('Unable to Read application data from the database');
+                res.json({Message:"Unable to read application data announcements!!!"});
+                return;
+            }else{
+                let update_sql   = `UPDATE applications SET application_status='Rejected!!!!'`;
+                dataBase.query(update_sql,(err,result)=>{
+                    if (err) {
+                        console.log(err,"Error with sql code!!!");
+                        res.json({message:"Sql error!!!"});
+                    }else{
+                        console.log("Application rejected succefully✔✔✔");
+    
+                        let select_sql = `Select student_email From applications`
+                                +`\n  Where application_id = "${application_id}"`;
+                        dataBase.query(select_sql,(err,result)=>{
+                            if (err) {
+                                console.log("Unable to read email!!!");
+                                res.json({message:"Unable to send email!!!"});
+                            }else{
+                                var nodemailer = require('nodemailer');
+                                let transporter = nodemailer.createTransport({
+                                    service:'gmail',
+                                    host: 'smtp.gmail.com',
+                                    port:'587',
+                                    auth:{
+                                        user: 'tshwanevirtualhackathon@gmail.com',
+                                        pass: 'Tvh@0152'
+                                    },
+                                    secureConnection: 'false',
+                                    tls: {
+                                        ciphers: 'SSLv3',
+                                        rejectUnauthorized: false
+                                    }
+                                  }); 
+                                 
+                                 message ={
+    
+                                    from:'tshwanevirtualhackathon@gmail.com',
+                                    to:JSON.stringify(result),
+                                    subject:'No reply :TVH Rejection',
+                                    text: ( 'You Have been Rejected to participate in the TVH event' 
+                                     +'\n\n Please apply next time💻💻'
+                                     +'\n\n Application status: ' + 'Rejected!!!'
+                                     +'\n\n\n Once again thank you for applying in this year Event💻💻🖥💻')
+                                };
+    
+                                transporter.sendMail(message,function(err, info) {
+                                    if (err) {
+                                        console.log(err)
+                                      } else {
+                                        console.log(info);
+                                      }  
+                                });
+                                res.json({message:"Rejection Email Sent✔✔✔"});
+                            }
+                        })
+                    }
+                })
+                
+                return;
+            }
+           });
+    });
 module.exports = router;

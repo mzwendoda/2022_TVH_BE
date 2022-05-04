@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 24, 2022 at 02:18 PM
+-- Generation Time: May 04, 2022 at 01:26 PM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.27
 
@@ -34,6 +34,13 @@ CREATE TABLE `administrator` (
   `admin_email` text NOT NULL,
   `admin_password` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `administrator`
+--
+
+INSERT INTO `administrator` (`admin_id`, `admin_name`, `admin_surname`, `admin_email`, `admin_password`) VALUES
+(1, 'Lindelani', 'Mthethwa', '216332520@tut4life.ca.za', 'Mthethwa@4435');
 
 -- --------------------------------------------------------
 
@@ -73,15 +80,16 @@ CREATE TABLE `applications` (
   `specialization` text NOT NULL,
   `student_level` text NOT NULL,
   `student_campus` text NOT NULL,
-  `student_role` text NOT NULL
+  `student_role` text NOT NULL,
+  `application_status` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `applications`
 --
 
-INSERT INTO `applications` (`application_id`, `student_name`, `student_surname`, `student_age`, `student_gender`, `student_number`, `student_email`, `student_cellno`, `student_faculty`, `specialization`, `student_level`, `student_campus`, `student_role`) VALUES
-(26, 'Lindelani', 'Mthethwa', 0, 'M', 1995, 'lindelani4435@gmail.com', 649204435, 'ICT', 'Software Development', 'Final year', 'Sosh South', 'Playing chess');
+INSERT INTO `applications` (`application_id`, `student_name`, `student_surname`, `student_age`, `student_gender`, `student_number`, `student_email`, `student_cellno`, `student_faculty`, `specialization`, `student_level`, `student_campus`, `student_role`, `application_status`) VALUES
+(33, 'Lindelani', 'Mthethwa', 26, 'M', 216332520, '216332520@tut4life.ac.za', 649204435, 'ICT', 'Software Development', 'Third year', 'Sosh South', 'Back_end developer', 'Panding!!!!');
 
 -- --------------------------------------------------------
 
@@ -121,6 +129,18 @@ INSERT INTO `deletedapplications` (`application_id`, `student_number`, `student_
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `gallary`
+--
+
+CREATE TABLE `gallary` (
+  `gallary_id` int(11) NOT NULL,
+  `picture` text NOT NULL,
+  `video` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `participants`
 --
 
@@ -137,7 +157,8 @@ CREATE TABLE `participants` (
 --
 
 INSERT INTO `participants` (`p_id`, `pImage`, `pName`, `pRole`, `pDescription`) VALUES
-(1, 'Url Location to Profile Picture', 'Lindelani Mthethwa', 'Back end Developer', 'Lindelani develops and programm the API end points which will respond to the requests made in the Administrator front end');
+(1, 'Url Location to Profile Picture', 'Lindelani Mthethwa', 'Back end Developer', 'Lindelani develops and programm the API end points which will respond to the requests made in the Administrator front end'),
+(2, 'Profile Picture', 'Team member Name', 'Team Member Role', 'Team member description');
 
 --
 -- Indexes for dumped tables
@@ -168,6 +189,12 @@ ALTER TABLE `deletedapplications`
   ADD PRIMARY KEY (`application_id`);
 
 --
+-- Indexes for table `gallary`
+--
+ALTER TABLE `gallary`
+  ADD PRIMARY KEY (`gallary_id`);
+
+--
 -- Indexes for table `participants`
 --
 ALTER TABLE `participants`
@@ -181,7 +208,7 @@ ALTER TABLE `participants`
 -- AUTO_INCREMENT for table `administrator`
 --
 ALTER TABLE `administrator`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `announcements`
@@ -193,7 +220,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `applications`
 --
 ALTER TABLE `applications`
-  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `deletedapplications`
@@ -202,10 +229,16 @@ ALTER TABLE `deletedapplications`
   MODIFY `application_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
+-- AUTO_INCREMENT for table `gallary`
+--
+ALTER TABLE `gallary`
+  MODIFY `gallary_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `participants`
 --
 ALTER TABLE `participants`
-  MODIFY `p_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `p_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

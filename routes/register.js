@@ -36,43 +36,54 @@ router.post("/register", (req,res) =>{
                                     res.json({Message:"Error in the SQL statement!!!!"});
                                     return;
                                 }else{
-                                    res.send({message:"Application successfully captured✔✔✔"});
-                                        var nodemailer = require('nodemailer');
-                                        let transporter = nodemailer.createTransport({
-                                            service:'gmail',
-                                            host: 'smtp.gmail.com',
-                                            port:'587',
-                                            auth:{
-                                                user: 'tshwanevirtualhackathon@gmail.com',
-                                                pass: 'Tvh@0152'
-                                            },
-                                            secureConnection: 'false',
-                                            tls: {
-                                                ciphers: 'SSLv3',
-                                                rejectUnauthorized: false
-                                            }
-                                    }); 
+                                    let update_sql   = `UPDATE applications SET application_status='Panding!!!!'`;
+                                    dataBase.query(update_sql,(err,result) =>{
+                                        if(err){
+                                            console.log('Unable to update application status!!!');
+                                            res.json({Message:"Unable to update!!!"});
+                                            return;
+                                        }else{
+                                            res.json({message:"Application successfully captured✔✔✔"});
+                                            var nodemailer = require('nodemailer');
+                                            let transporter = nodemailer.createTransport({
+                                                service:'gmail',
+                                                host: 'smtp.gmail.com',
+                                                port:'587',
+                                                auth:{
+                                                    user: 'tshwanevirtualhackathon@gmail.com',
+                                                    pass: 'Tvh@0152'
+                                                },
+                                                secureConnection: 'false',
+                                                tls: {
+                                                    ciphers: 'SSLv3',
+                                                    rejectUnauthorized: false
+                                                }
+                                             }); 
                                  
-                                    message ={
+                                            message ={
 
-                                    from:'tshwanevirtualhackathon@gmail.com',
-                                    to:JSON.stringify(student_email),
-                                    subject:'No reply :TVH Application',
-                                    text: ( 'You Have successfully applied  for TVH ' 
-                                     +'\n participant Name : '+ student_name
-                                    +'\n participant Surname     : ' + student_surname
-                                    +'\n participant specialization     : ' + specialization 
-                                    +'\n\n\n If your application is succesfull you will hear from us,' 
-                                    +'\n if not please apply next time')
-                                };
+                                                from:'tshwanevirtualhackathon@gmail.com',
+                                                to:JSON.stringify(student_email),
+                                                subject:'No reply :TVH Application',
+                                                text: ( 'You Have successfully applied  for TVH ' 
+                                                +'\n participant Name : '+ student_name
+                                                +'\n participant Surname     : ' + student_surname
+                                                +'\n participant specialization     : ' + specialization
+                                                +'\n application status         : '+ 'Panding!!!' 
+                                                +'\n\n\n If your application is succesfull you will hear from us,' 
+                                                +'\n if not please apply next time')
+                                            };
 
-                                transporter.sendMail(message,function(err, info) {
-                                    if (err) {
-                                        console.log(err)
-                                      } else {
-                                        console.log(info);
-                                      }   
-                                });
+                                            transporter.sendMail(message,function(err, info) {
+                                                if (err) {
+                                                    console.log(err)
+                                                } else {
+                                                    console.log(info);
+                                                }   
+                                            });
+                                            return;
+                                        }
+                                    });
                                         return;
                                 }
                             })    
