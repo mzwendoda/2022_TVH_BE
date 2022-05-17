@@ -13,8 +13,11 @@ const dataBase = mysql.createConnection({
 
 dataBase.connect(err =>{
 
-    if(err) {console.log('err');}
-    console.log('database connected..');
+    if(err){
+      console.log('err');
+    }else{
+      console.log('database connected..');
+    }
 });
 
 module.exports = dataBase;

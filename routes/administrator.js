@@ -130,22 +130,23 @@ router.delete("/deleteAnnouncement/:id", (req,res) =>{
 
 //Participants Routes
 router.post("/addTeamMember", (req,res) =>{
-    const { pImage,pName,pRole,pDescription} = req.body     
+    const { name,surname,occupation,category,description,image	} = req.body     
         //Filled Validation
-        if(pImage == undefined||pImage==""||pName==undefined||pName==""||
-        pRole==undefined||pRole==""||pDescription==undefined||pDescription==""){
+        if(name == undefined||name==""||surname==undefined||surname==""||
+        occupation==undefined||occupation==""||category==undefined||category==""||
+        description==undefined||description==""||image==undefined||image==""){
             return res.json({message:"All fields are required!!!"});
         }else{
             //Inserting a user to users database
-            let insert_sql =`INSERT INTO participants( pImage,pName,pRole,pDescription)`
-            +            `\n VALUES ("${pImage}","${pName}", "${pRole}", "${pDescription}")`;
+            let insert_sql =`INSERT INTO team( name,surname,occupation,category,description,image)`
+            +            `\n VALUES ("${name}","${surname}", "${occupation}", "${category}","${description}","${image}")`;
             dataBase.query(insert_sql,(err,result) =>{
                 if(err){
                  console.log(err,'errs');
-                 res.json({Message:"Unable add participant Informatiom!!!"});
+                 res.json({Message:"Unable add team member Informatiom!!!"});
                  return;
                 }else{
-                    res.json({message:"Participant profile successfully✔✔✔"});
+                    res.json({message:"Team member profile successfully✔✔✔"});
                     return; 
                 }
             });
@@ -153,14 +154,14 @@ router.post("/addTeamMember", (req,res) =>{
     });
 
     router.get("/viewTeamMembers", (req,res) =>{
-        let read_sql = `SELECT * FROM participants`;
+        let read_sql = `SELECT * FROM team`;
         dataBase.query(read_sql,(err,result) =>{
             if(err){
                 console.log('error in the sql statement!!!');
                 res.send({Message:"Unable to read data!!!"});
                 return;
             }else{
-                res.send({message:"Participants data successfully fetched✔✔✔",data:result});
+                res.send({message:"Team member data successfully fetched✔✔✔",data:result});
                 return;
             }
            });
@@ -168,17 +169,64 @@ router.post("/addTeamMember", (req,res) =>{
     
     router.get("/viewTeamMember/:id", (req,res) =>{
         let participant_id = req.params.id;
-        let read_sql = `Select * From participants Where p_id = "${participant_id}"`;
+        let read_sql = `Select * From team Where p_id = "${participant_id}"`;
         dataBase.query(read_sql,(err,result) =>{
             if(err){
                 console.log('error in the sql statement!!!!!!');
-                res.send({Message:"Unable to Read data for the selected participant!!!"});
+                res.send({Message:"Unable to Read data for the selected team member!!!"});
                 return;
             }else{
-                res.send({message:"Participant data successfully fetched✔✔✔",data:result});
+                res.send({message:"Team member data successfully fetched✔✔✔",data:result});
                 return;
             }
            });
+    });
+
+    router.delete("/deleteMember/:id",(req,res)=>{
+        let member_id = req.params.id;
+        let create_sql =`Insert Into deletedparticipants`
+        +               `\nSelect * From team`
+        +               `\nWhere p_id = '${member_id}'`;
+        dataBase.query(create_sql,(err,result)=>{
+            if (err) {
+                console.log(err,"Unable to move data!!!");
+                res.send({message:"Unable to move data!!!"});
+                return;
+            }else{
+                let delete_sql = `Delete From team`
+                +                `\nWhere p_id = '${member_id}'`;
+                dataBase.query(delete_sql,(err,result)=>{
+                    if (err) {
+                        console.log(err,"Unable to delete data!!!");
+                        res.send({message:"Unable to delete data!!!"});
+                        return;
+                    }else{
+                        res.send({message:"Team Member Data successfully deleted✔✔✔"});
+                        return;
+                    }
+                });
+            }
+        });
+    });
+
+    router.put("/updateMember/:id",(req,res)=>{
+        let member_id = req.params.id;
+        const { name,surname,occupation,category,description,image	} = req.body
+
+        let update_sql = `Update team Set name ='${name}',surname = '${surname}'`
+        +                `\n,occupation = '${occupation}',category = '${category}',description = '${description}',image = '${image}'`
+        +                `\nWhere p_id = '${member_id}'`;
+        dataBase.query(update_sql,(err,result)=>{
+            if (err) {
+                console.log(err,"Unable to update data!!!");
+                res.send({message:"Unable to update data!!!"});
+                return;
+            }else{
+                res.send({message:"Team Member Data successfully updated✔✔✔"});
+                return;
+            }
+        });
+
     });
 
     router.get("/acceptApplication/:id", (req,res) =>{
