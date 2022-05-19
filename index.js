@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const bodypaser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2'); 
@@ -6,7 +7,9 @@ const { response } = require('express');
 const fileupload = require('express-fileupload')
 const path = require('path');
 const util = require('util');
-
+const upload = multer({dest: './public/uploads'});
+const fs = require("fs");
+const http = require("http");
 
 const app = express();
 app.use(express.json());
@@ -16,6 +19,9 @@ app.use(fileupload());
 
 app.use(cors());
 app.use(bodypaser.json());
+
+app.use(express.static('public'))
+app.use('/public/uploads',express.static('public/uploads'))
 
 
 ////Database connection
@@ -108,7 +114,8 @@ app.get('/adminLoadFile', (_req, _res) =>{
 app.get('/adminLoadFile', (_req, _res) =>{
     
 
-    let qr = `select *  FROM applications `;
+    let qr = `select *  FROM application `;
+    
    
     
     db.query(qr, (err, result) => {
@@ -212,16 +219,20 @@ app.post('/login', (req, res) =>{
        
 });
 
-/*
+
+///Post notice to the database
+
 app.post('/notice', (req, res) =>{
 
     console.log(req.body,'LoadToNotice');
 
-    let input = req.body.fullnam;
+    let title = req.body.title;
+    let message = req.body.message;
+    let date = req.body.date;
 
 
  
-    let sql1 =`SELECT noticeMessage from admin WHERE email = "${eml}" AND password = "${pass}" AND admin_name = "${names}" `;
+    let sql1 =`INSERT INTO  announcement (title, message, date) VALUES ("${title}", "${message}" , "${date}")`;
 
     
     db.query(sql1,(err,result) =>{
@@ -233,12 +244,14 @@ app.post('/notice', (req, res) =>{
 
             return
         }
-        if(result.length >0)
+        if(result.length > 0)
         {
+
+            
           
             res.send({
 
-                message: 'login Successful',
+                message: 'Notice updated successfully',
                 data:result
 
             
@@ -251,7 +264,7 @@ app.post('/notice', (req, res) =>{
          
             res.send({
 
-                message: 'Please enter the correct data'
+                message: 'An error occured notice not updated'
                 
 
             
@@ -266,7 +279,63 @@ app.post('/notice', (req, res) =>{
        
 });
 
-*/
+
+
+
+
+//get all data from database to notice
+
+app.get('/noticeLoadFile', (_req, _res) =>{
+    
+
+    let qr = `select *  FROM announcement `;
+   
+    
+    db.query(qr, (err, result) => {
+
+        if(err)
+        {
+            console.log(err,'errs');
+        }
+        if(result.length >0)
+        { 
+           
+                
+                      
+            _res.send({
+
+                message: 'data retrieved ',
+                data:result
+
+            
+            });
+            return
+                
+
+                
+        }else{
+
+         
+            _res.send({
+
+                message: 'Not retieved'
+                
+
+            
+            });
+            return
+         
+        }
+           
+            
+
+  
+        }
+    );
+
+});
+
+
 
 
 ///Registration Form
@@ -277,19 +346,27 @@ app.post('/registrations', (req, res) =>{
 
 
 
-    const {student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno, participant_skills,student_faculty,specialization,student_level,student_campus,student_hobby} = req.body     
+    const {stud_number,name,surname,gender,age,stud_email,faculty, mobile_number,skills,level,specialization,campus} = req.body     
     //Filled Validation
-    if(student_number == undefined||student_number==""||student_name==undefined||student_name==""||
-    student_surname==undefined||student_surname==""||student_gender==undefined||student_gender==""||
-    student_dob==undefined||student_dob==""||student_email==undefined||student_email==""||
-    student_cellno==undefined||student_cellno==""||participant_skills==undefined||participant_skills==""||student_faculty==undefined||student_faculty==""||
-    specialization==undefined||specialization==""||student_level==undefined||student_level==""||
-    student_campus==undefined||student_campus==""||
-    student_hobby==undefined||student_hobby==""){
+
+
+    let tutEmail = stud_number+"@tut4life.ac.za";    
+
+    if(stud_number == undefined||stud_number==""||name==undefined||name==""||
+    surname==undefined||surname==""||gender==undefined||gender==""||
+    age==undefined||age==""||stud_email==undefined||stud_email==""||
+    faculty==undefined||faculty==""||mobile_number==undefined||mobile_number==""||skills==undefined||skills==""||
+    level==undefined||level==""||specialization==undefined||specialization==""||
+    campus==undefined||campus==""){
         return res.json({message:"All fields are required!!!"});
     }else{
         //Email Validation
-        let select_sql =`SELECT student_email from applications WHERE student_email = "${student_email}"`;
+
+    if(stud_email==tutEmail)
+    {
+
+
+        let select_sql =`SELECT stud_email from application WHERE stud_email = "${stud_email}"`;
         db.query(select_sql,(err,result) =>{
             if(err){
                 console.log(err,'errs');
@@ -301,15 +378,15 @@ app.post('/registrations', (req, res) =>{
                     res.json({message:"Email already signed up!!!"});
                     return;
                 }else{
-                    let insert_sql =`INSERT INTO applications( student_number,student_name,student_surname,student_gender,student_dob,student_email,student_cellno, participant_skills,student_faculty,specialization,student_level,student_campus,student_hobby)`
-                                +   `\nVALUES("${student_number}","${student_name}", "${student_surname}", "${student_gender}","${student_dob}","${student_email}","${student_cellno}", "${participant_skills}","${student_faculty}","${specialization}","${student_level}","${student_campus}","${student_hobby}")`;
+                    let insert_sql =`INSERT INTO application( stud_number,name,surname,gender,age,stud_email,faculty, mobile_number,skills,level,specialization,campus)`
+                                +   `\nVALUES("${stud_number}","${name}", "${surname}", "${gender}","${age}","${stud_email}","${faculty}", "${mobile_number}","${skills}","${level}","${specialization}","${campus}")`;
                     db.query(insert_sql,(err,result) =>{
                         if(err){
                             console.log(err,'errs');
                             res.json({Message:"Unable to capture application!!!"});
                             return;
                         }else{
-                            let update_sql   = `UPDATE applications SET application_status='Panding!!!!'`;
+                            let update_sql   = `UPDATE application SET status='Pending...'`;
                             db.query(update_sql,(err,result) =>{
                                 if(err){
                                     console.log('Unable to update application status!!!');
@@ -331,18 +408,18 @@ app.post('/registrations', (req, res) =>{
                                             ciphers: 'SSLv3',
                                             rejectUnauthorized: false
                                         }
-                                }); 
+                                     }); 
                              
                                 message ={
 
                                 from:'gunman4435@gmail.com',
-                                to:JSON.stringify(student_email),
+                                to:JSON.stringify(stud_email),
                                 subject:'No reply :TVH Application',
                                 text: ( 'You Have successfully applied  for TVH ' 
-                                 +'\n participant Name : '+ student_name
-                                +'\n participant Surname     : ' + student_surname
+                                 +'\n participant Name : '+ name
+                                +'\n participant Surname     : ' + surname
                                 +'\n participant specialization     : ' + specialization
-                                +'\n application status         : '+ 'Panding!!!' 
+                                +'\n application status         : '+ 'Pending!!!' 
                                 +'\n\n\n If your application is succesfull you will hear from us,' 
                                 +'\n if not please apply next time')
                             };
@@ -363,7 +440,16 @@ app.post('/registrations', (req, res) =>{
                     });                                         
                 }
             }
-        });    
+        });   
+
+
+    }
+    else
+    {
+        res.json({message:"Please enter your tut4life email"});
+
+    }
+ 
          
 
     }
@@ -421,6 +507,45 @@ app.post("/signUp", (req,res) =>{
                                             return;
                                         }else{
                                             res.json({message:"User signed Up successfully✔✔✔"});
+                                            var nodemailer = require('nodemailer');
+                                            let link;
+                                            let transporter = nodemailer.createTransport({
+                                                service:'gmail',
+                                                host: 'smtp.gmail.com',
+                                                port:'587',
+                                                auth:{
+                                                    user: 'gunman4435@gmail.com',
+                                                    pass: 'Mthethwa@4435'
+                                                },
+                                                secureConnection: 'false',
+                                                tls: {
+                                                    ciphers: 'SSLv3',
+                                                    rejectUnauthorized: false
+                                                }
+                                             }); 
+
+                                             link = "http://localhost:4200/user-login";
+                                     
+                                        message ={
+        
+                                        from:'gunman4435@gmail.com',
+                                        to:JSON.stringify(email),
+                                        subject:'No reply :TVH Account',
+                                        text: ( 'Thank you for creating the account ' 
+                                         +'\n user Name : '+ name
+                                        +'\n user Surname     : ' + surname),
+                                        html: "Please Click the following link to confirm your password " + link
+                                    };
+        
+                                    transporter.sendMail(message,function(err, info) {
+                                        if (err) {
+                                            console.log(err)
+                                          } else {
+                                            console.log(info);
+                                          }   
+                                    });
+                                         let isVerified = false;
+
                                             return;
                                         }
                                        });                                         
@@ -470,84 +595,412 @@ app.post("/userLogin", (req,res) =>{
     
 });
 
+//----------------------------------------------Start_UploadFile---------------------------------------------------------------//
 
-//Testing to upload pdf file
 
-app.post("/upload", async (req, res) => {
+///Insert to teams
 
-	try{
-	
-	const file = req.files.file;
+app.post('/uploadTeam', async(req, res) =>{
+
+
+    let name = req.body.name;
+    let surname = req.body.surname;
+    let occupation = req.body.occupation;
+    let catagory = req.body.catagory;
+    let description = req.body.description;
+
+
+    const file = req.files.file;
 	const fileName = file.name;
 	const size = file.data.length;
 	const extension = path.extname(fileName);
 	
-	const allowedExtensions = /pdf|jpg|png/;
+	const allowedExtensions = /jpg|png/;
 	
-	if(!allowedExtensions.test(extension)) throw "Unsupported extension";
-	if(size > 5000000) throw "File must be less than 5MB"
+	if(!allowedExtensions.test(extension))
+    {
+        res.send({
+
+            message: 'Unsupported extension '
+            
+        });
+    } 
+	if(size > 5000000)
+    {
+        res.send({
+
+            message: 'File must be less than 5MB '
+            
+        });
+    } 
 	
 	const md5 = file.md5;
 	const URL = "/uploads/" + md5 + extension;
-	
-	await util.promisify(file.mv)("./public" + URL);
-	
-	res.json({
-	
-		message: "File uploaded successfully",
-	})
-	
-	
-	}catch(err){
-	
-	console.log(err)
-	res.status(500).json({
-	
-	message: err,
-	
-	});
-	
-	
-	}
+    await util.promisify(file.mv)("./public" + URL);
 
+    let sql = `INSERT INTO team (name, surname, occupation, catagory, description, file) VALUES("${name}", "${surname}", "${occupation}", "${catagory}", "${description}", "${"http://localhost:9002/public"+URL}" )`;
 
-});
-//////////end of pdf file upload
+    db.query(sql,(err,result) =>{
 
+        
+        if(err)
+        {
+            console.log(err,'errs');
 
-//2nd post pdf
+            // return
+        }else
+        {
+            res.send({
 
-app.post('/pdf', (req, res) =>{
+                message: 'Team updated successfully',
+                data:result
 
-    if(req.files){
+            
+            });
+            //  return
+     
+        }
 
-        console.log(req.files)
-        var file = req.files.file
-        var filename = file.name
-        console.log(filename)
-
-        file.mv('./public/'+ filename, function(err){
-
-            if(err){
-                res.send(err)
-            }else{
-
-                res.send("file uploaded")
-            }
-        })
-    }
+        
+    });
+    //    return  
+    
 })
 
-//end
-
-
-///send email test
+///-----------------------------------------------Ending_UploadFile------------------------------------------------------------------///
 
 
 
-//send email-end
 
 
+//----------------------------------------------Start_RetrieveTeamFile---------------------------------------------------------------//
+
+
+app.get("/selectOrganiser",  (_req, _res) => {
+
+
+ 
+    
+
+    let sql = `Select * From team Where catagory = "Leading Organizing Team"`;
+
+    db.query(sql, async(err,result) =>{
+
+    if(err)
+    {
+        console.log(err,'errs');
+
+        return
+    }
+    if(result.length > 0)
+    {
+        _res.send({
+
+            message: 'Leading Organizing Team data retrieved ',
+            data:result
+
+        
+        });
+        return
+
+    }
+    else
+    {
+        _res.send({
+
+            message: 'Leading Organizing Team data  not found ',
+            
+
+        
+        });
+        return
+    }
+
+
+})
+
+})
+
+//////////////////
+
+app.get("/selectVolunteer", (_req, _res) => {
+
+
+
+    
+
+    let sql = `Select * From team Where catagory = "Industry Volunteer"`;
+
+    db.query(sql, async(err,result) =>{
+
+     
+    if(err)
+    {
+        console.log(err,'errs');
+
+        return
+    }
+    if(result.length > 0)
+    {
+
+        _res.send({
+
+            message: 'Industry Volunteer data retrieved ',
+            data:result
+
+        
+        });
+        return
+
+    }
+    else
+    {
+        _res.send({
+
+            message: 'Industry Volunteer data  not found ',
+            
+
+        
+        });
+        return
+    }
+
+
+})
+
+})
+
+//////////////////
+
+app.get("/selectMentor",(_req, _res) => {
+
+
+
+    
+
+    let sql = `Select * From team Where catagory = "Mentor"`;
+
+    db.query(sql, async(err,result) =>{
+
+       
+    if(err)
+    {
+        console.log(err,'errs');
+
+        return
+    }
+    if(result.length > 0)
+    {
+
+        _res.send({
+
+            message: 'Mentor data retrieved ',
+            data:result
+
+        
+        });
+        return
+
+    }
+    else
+    {
+        _res.send({
+
+            message: 'Mentor data  not found ',
+            
+
+        
+        });
+        return
+    }
+
+
+})
+
+})
+
+//////////////////
+
+app.get("/selectOrgTeam", (_req, _res) => {
+
+
+
+    
+
+    let sql = `Select * From team Where catagory = "Organizing Team"`;
+
+    db.query(sql, async(err,result) =>{
+
+       
+    if(err)
+    {
+        console.log(err,'errs');
+
+        return
+    }
+    if(result.length > 0)
+    {
+
+        _res.send({
+
+            message: 'Organizing Team data retrieved ',
+            data:result
+
+        
+        });
+        return
+
+    }
+    else
+    {
+        _res.send({
+
+            message: 'Organizing Team data not found ',
+            
+
+        
+        });
+        return
+
+    }
+
+
+})
+
+return
+})
+
+
+//----------------------------------------------End_RetrieveTeamFile---------------------------------------------------------------//
+
+
+///-------------------------------------Retrieve all teams----------------------------------------------------------//
+
+
+
+app.get("/selectTeam", (_req, _res) => {
+
+
+
+    
+
+    let sql = `Select * From team`;
+
+    db.query(sql, async(err,result) =>{
+
+       
+    if(err)
+    {
+        console.log(err,'errs');
+
+        return
+    }
+    if(result.length > 0)
+    {
+
+        _res.send({
+
+            message: 'Team data retrieved ',
+            data:result
+
+        
+        });
+        return
+
+    }
+    else
+    {
+        _res.send({
+
+            message: 'Team data not found ',
+            
+
+        
+        });
+        return
+
+    }
+
+
+})
+
+return
+})
+
+///--------------------------------------End retrieve team----------------------------------------------------------------//
+
+///--------------------------------------Delete_Team------------------------------------------------------------------------///
+
+app.delete("/deleteMember/:id",(req,res)=>{
+    let id = req.params.id;
+    let create_sql =`Insert Into deletedparticipants`
+    +               `\nSelect * From team`
+    +               `\nWhere id = '${id}'`;
+    dataBase.query(create_sql,(err,result)=>{
+        if (err) {
+            console.log(err,"Unable to move data!!!");
+            res.send({message:"Unable to move data!!!"});
+            return;
+        }else{
+            let delete_sql = `Delete From team`
+            +                `\nWhere id = '${id}'`;
+            dataBase.query(delete_sql,(err,result)=>{
+                if (err) {
+                    console.log(err,"Unable to delete data!!!");
+                    res.send({message:"Unable to delete data!!!"});
+                    return;
+                }else{
+                    res.send({message:"Team Member Data successfully deleted✔✔✔"});
+                    return;
+                }
+            });
+        }
+    });
+});
+
+///--------------------------------------End_Delete_Team-------------------------------------------------------------------///
+
+
+///-------------------------------------Edit_Team--------------------------------------------------------------------------///
+
+app.put("/updateMember/:id",(req,res)=>{
+    let id = req.params.id;
+    const { name,surname,occupation,category,description,file	} = req.body
+
+    let update_sql = `Update team Set name ='${name}',surname = '${surname}'`
+    +                `\n,occupation = '${occupation}',category = '${category}',description = '${description}',file = '${file}'`
+    +                `\nWhere id = '${id}'`;
+    dataBase.query(update_sql,(err,result)=>{
+        if (err) {
+            console.log(err,"Unable to update data!!!");
+            res.send({message:"Unable to update data!!!"});
+            return;
+        }else{
+            res.send({message:"Team Member Data successfully updated✔✔✔"});
+            return;
+        }
+    });
+
+});
+
+
+app.get("/viewTeamMember/:id", (req,res) =>{
+    let id = req.params.id;
+    let read_sql = `Select * From team Where p_id = "${id}"`;
+    dataBase.query(read_sql,(err,result) =>{
+        if(err){
+            console.log('error in the sql statement!!!!!!');
+            res.send({Message:"Unable to Read data for the selected team member!!!"});
+            return;
+        }else{
+            res.send({message:"Team member data successfully fetched✔✔✔",data:result});
+            return;
+        }
+       });
+});
+
+
+////------------------------------------End_Edit_Time-----------------------------------------------------------------------//
 
 
 
