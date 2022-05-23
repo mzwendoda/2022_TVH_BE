@@ -28,7 +28,7 @@ app.use('/public/uploads',express.static('public/uploads'))
 
 const db = mysql.createConnection({
 
-    host: 'db-tvh2022-inst.cvqpj5ith2h1.us-east-1.rds.amazonaws.com',
+    host: 'tvh-db-inst.c1wcxiext4vo.us-east-1.rds.amazonaws.com',
     user: 'admin',
     password:'tvh2022icep',
     database: 'tvhdb',
